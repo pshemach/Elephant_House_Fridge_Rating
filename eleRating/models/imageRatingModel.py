@@ -10,11 +10,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 categories = ['not_rated', 'rated']
 output_shape = len(categories)
 
-transform = transforms.Compose([
-    transforms.Resize((640,640)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
 
 model = torchvision.models.efficientnet_b0(pretrained=True).to(device)
 
@@ -27,7 +22,7 @@ model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\research\mo
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
-def predict_rating(image_path):
+def predict_rating(image_path, transform):
     img = Image.open(image_path).convert('RGB')
     img_tensor = transform(img).unsqueeze(0)
     img_tensor = img_tensor.to(device)
@@ -36,10 +31,3 @@ def predict_rating(image_path):
         output = model(img_tensor)
         predicted_class = torch.argmax(output, dim=1).item()
         return categories[predicted_class]
-    
-
-# image_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\data\rated_5.jpg'
-
-# predicted_rating = predict_rating(image_path)
-
-# print(f'Predicted rating: {predicted_rating}')
