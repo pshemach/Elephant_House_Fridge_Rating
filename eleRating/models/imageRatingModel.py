@@ -37,12 +37,8 @@ def predict_rating(image_path):
         return categories[predicted_class]
     
 
-# image_path = 'example_image.jpg'
+image_path = '../../data/not_rated (10).jpg'
 
-# predicted_rating = predict_rating(image_path)
+predicted_rating = predict_rating(image_path)
 
-# print(f'Predicted rating: {predicted_rating}')
-
-
-
-
+print(f'Predicted rating: {predicted_rating}')
