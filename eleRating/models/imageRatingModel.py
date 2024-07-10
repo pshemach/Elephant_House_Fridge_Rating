@@ -7,7 +7,7 @@ import torch.nn as nn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-categories = ['rated', 'not_rated']
+categories = ['not_rated', 'rated']
 output_shape = len(categories)
 
 transform = transforms.Compose([
@@ -23,7 +23,8 @@ model.classifier = nn.Sequential(
     nn.Linear(in_features=1280, out_features=output_shape, bias=True)
   ).to(device)
 
-model.load_state_dict(torch.load('mobilenet_transfer_learning.pth', map_location=device))
+model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\research\mobilenet_transfer_learning.pth'
+model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
 def predict_rating(image_path):
@@ -37,8 +38,8 @@ def predict_rating(image_path):
         return categories[predicted_class]
     
 
-image_path = '../../data/not_rated (10).jpg'
+# image_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\data\rated_5.jpg'
 
-predicted_rating = predict_rating(image_path)
+# predicted_rating = predict_rating(image_path)
 
-print(f'Predicted rating: {predicted_rating}')
+# print(f'Predicted rating: {predicted_rating}')
