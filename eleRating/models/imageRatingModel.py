@@ -22,10 +22,8 @@ model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\research\mo
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
-def predict_rating(image_path, transform):
-    img = Image.open(image_path).convert('RGB')
-    img_tensor = transform(img).unsqueeze(0)
-    img_tensor = img_tensor.to(device)
+def predict_rating(image_tensor):
+    img_tensor = image_tensor.to(device)
     
     with torch.no_grad():
         output = model(img_tensor)
