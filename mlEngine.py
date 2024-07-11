@@ -4,6 +4,7 @@ from torchvision.transforms import transforms
 from PIL import Image
 import torch.nn as nn
 from eleRating.models.imageRatingModel import predict_rating
+from eleRating.models.productSegModel import get_products
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -20,4 +21,10 @@ def get_prediction(image_path):
     if image_selection == 'not_rated':
         return image_selection
     elif image_selection == 'rated':
-        return image_selection
+        classes = get_products(image_path=image_path)
+        if set(classes) == {'elephant-product', 'fridge'}:
+            return 'Good'
+        elif set(classes) == {'other', 'elephant-product', 'fridge'}:
+            return 'Bad'
+        elif set(classes) == {'other', 'fridge'}:
+            return 'Worst'
