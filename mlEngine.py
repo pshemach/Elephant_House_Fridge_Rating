@@ -17,14 +17,16 @@ transform = transforms.Compose([
 
 
 def get_prediction(image_path):
-    image_selection = predict_rating(image_path=image_path, transform=transform)
+    image = Image.open(image_path).convert('RGB')
+    image_tensor = transform(image).unsqueeze(0)
+    image_selection = predict_rating(image_tensor=image_tensor)
     if image_selection == 'not_rated':
         return image_selection
     elif image_selection == 'rated':
-        classes = get_products(image_path=image_path)
-        if set(classes) == {'elephant-product', 'fridge'}:
+        classes = get_products(image_path=image)
+        if classes == {'elephant-product', 'fridge'} or classes == {'elephant-product'}:
             return 'Good'
-        elif set(classes) == {'other', 'elephant-product', 'fridge'}:
+        elif classes == {'other', 'elephant-product', 'fridge'} or classes == {'other', 'elephant-product'}:
             return 'Bad'
-        elif set(classes) == {'other', 'fridge'}:
+        elif classes == {'other', 'fridge'} or classes == {'other'} or classes == {'fridge'}:
             return 'Worst'
