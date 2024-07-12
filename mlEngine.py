@@ -24,9 +24,9 @@ def get_prediction(image_path):
         return image_selection
     elif image_selection == 'rated':
         classes = get_products(image_path=image)
-        if classes == {'elephant-product', 'fridge'} or classes == {'elephant-product'}:
+        if 'elephant-product' in classes and 'other' not in classes:
             return 'Good'
-        elif classes == {'other', 'elephant-product', 'fridge'} or classes == {'other', 'elephant-product'}:
+        elif 'elephant-product' in classes and 'other' in classes:
             return 'Bad'
-        elif classes == {'other', 'fridge'} or classes == {'other'} or classes == {'fridge'}:
+        elif 'elephant-product' not in classes:
             return 'Worst'
