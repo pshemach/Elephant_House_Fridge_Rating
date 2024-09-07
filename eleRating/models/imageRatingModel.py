@@ -18,7 +18,7 @@ model.classifier = nn.Sequential(
     nn.Linear(in_features=1280, out_features=output_shape, bias=True)
   ).to(device)
 
-model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\research\mobilenet_transfer_learning.pth'
+model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\pretrainedModels\mobilenet_transfer_learning.pth'
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
