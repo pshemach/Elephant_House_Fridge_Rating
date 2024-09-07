@@ -23,4 +23,4 @@ def image_selection():
     return jsonify({'error': 'Invalid request method'})
 
 if __name__ == '__main__':
-    app.run(port=5050, debug=True)
+    app.run(port=8080, debug=True)
