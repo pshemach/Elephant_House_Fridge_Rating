@@ -1,11 +1,11 @@
 from ultralytics import YOLO
 
-model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\eleRating\models\my_model_1.pt'
+model_path = r'C:\Users\PC\Desktop\test\Elephant_House_Fridge_Rating\eleRating\models\my_model_4.pt'
 
 model = YOLO(model_path)
 
 def get_products(image_path):
-    results = model.predict(image_path)
+    results = model.predict(image_path, save=True)
     detected_classes=[]
     for result in results:
         if result.boxes is not None:
