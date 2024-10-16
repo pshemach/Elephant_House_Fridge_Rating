@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify
-from PIL import Image
-import io
 from eleRating.pipeline.run_prediction import run_prediction
 from eleRating.utils import is_allowed
 
