@@ -1,8 +1,8 @@
 ipykernel
-numpy==1.24.1
-matplotlib
-ultralytics==8.0.196
+ultralytics==8.3.12
 torch
 torchvision
 from_root
+Pillow
+pyyaml
 -e .

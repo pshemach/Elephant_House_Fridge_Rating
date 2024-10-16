@@ -1,0 +1,6 @@
+model:
+  segmentation_path: "data/pre_trained_models/my_model_5.pt"
+  rating_model_path: "data/pre_trained_models/mobilenet_transfer_learning.pth"
+
+paths:
+  test_image: "data/test_images/test_image.jpg"

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from mlEngine import get_prediction
+from eleRating.pipeline.run_prediction import run_prediction
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def image_selection():
         image = request.files.get('image')
         if image and is_allowed(image.filename):
             try:
-                prediction = get_prediction(image)
+                prediction = run_prediction(image)
                 return jsonify({'prediction': prediction})
             except Exception as e:
                 return jsonify({'error': str(e)})
