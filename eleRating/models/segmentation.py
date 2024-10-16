@@ -20,7 +20,7 @@ def get_products(image):
     model = YOLO(model_path)
 
     # Get results from the model
-    results = model.predict(image, save=True)
+    results = model.predict(image, save=True, conf=0.5)
 
     # Collect detected classes
     detected_classes = []
