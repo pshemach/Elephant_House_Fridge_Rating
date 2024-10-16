@@ -1,26 +1,33 @@
 from flask import Flask, request, jsonify
+from PIL import Image
+import io
 from eleRating.pipeline.run_prediction import run_prediction
+from eleRating.utils import is_allowed
 
 app = Flask(__name__)
 
-ALLOWED_FILE_EXTENTION = ['jpg','png','jpeg']
-
-def is_allowed(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_FILE_EXTENTION
-
-
-@app.route('/predict', methods=['GET','POST'])
+@app.route('/predict', methods=['POST'])
 def image_selection():
+    """
+    API route for handling image uploads and returning the prediction result.
+    """
     if request.method == 'POST':
+        # Check if image file is part of the request
         image = request.files.get('image')
+
+        # Validate the uploaded file
         if image and is_allowed(image.filename):
             try:
-                prediction = run_prediction(image)
-                return jsonify({'prediction': prediction})
+
+                rating = run_prediction(image)
+                return jsonify({'prediction': rating})
+            
             except Exception as e:
-                return jsonify({'error': str(e)})
-        return jsonify({'error': 'Invalid image file'})
-    return jsonify({'error': 'Invalid request method'})
+                return jsonify({'error': str(e)}), 500
+        else:
+            return jsonify({'error': 'Invalid image file. Allowed file types: jpg, jpeg, png.'}), 400
+
+    return jsonify({'error': 'Invalid request method. Use POST.'}), 405
 
 if __name__ == '__main__':
     app.run(port=8080, debug=True)
