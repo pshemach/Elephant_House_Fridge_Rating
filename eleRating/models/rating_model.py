@@ -5,40 +5,47 @@ import yaml
 from PIL import Image
 import torch.nn as nn
 
+
 # Load config file
-def load_config(config_path='config/config.yaml'):
-    with open(config_path, 'r') as file:
+def load_config(config_path="config/config.yaml"):
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
+
 
 config = load_config()  # Load the configuration
 
 # Device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define the categories
-categories = ['not_rated', 'rated']
+categories = ["not_rated", "rated"]
+
 
 # Define the model architecture
 def load_rating_model():
     model = torchvision.models.efficientnet_b0(pretrained=True).to(device)
     model.classifier = nn.Sequential(
         nn.Dropout(p=0.2, inplace=True),
-        nn.Linear(in_features=1280, out_features=len(categories), bias=True)
+        nn.Linear(in_features=1280, out_features=len(categories), bias=True),
     ).to(device)
-    
+
     # Load the model's state dictionary from the path in the config
-    model_path = config['model']['rating_model_path']
+    model_path = config["model"]["rating_model_path"]
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     return model
 
+
 # Transformation pipeline
-transform = transforms.Compose([
-    transforms.Resize((640, 640)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+transform = transforms.Compose(
+    [
+        transforms.Resize((640, 640)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
+
 
 def get_rating(image: Image.Image):
     """
