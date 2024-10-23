@@ -1,6 +1,14 @@
 model:
-  segmentation_path: "data/pre_trained_models/my_model_5.pt"
+  segmentation_path: "data/pre_trained_models/model.pt"
   rating_model_path: "data/pre_trained_models/mobilenet_transfer_learning.pth"
 
 paths:
   test_image: "data/test_images/test_image.jpg"
+
+instances:
+  classify_cls: ["not_rated", "rated"]
+  segment_ins:
+    fridge: "fridge"
+    products: ["elephant-product", "other"]
+
+output_cat: ["Not Rated", "Good", "Bad", "Worst"]
