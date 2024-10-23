@@ -1,25 +1,20 @@
 import torch
 import torchvision
 from torchvision.transforms import transforms
-import yaml
 from PIL import Image
 import torch.nn as nn
+from eleRating.utils import load_config
+from eleRating.constant import CONFIG_PATH
 
+# Load the configuration
+config = load_config(config_path=CONFIG_PATH)
 
-# Load config file
-def load_config(config_path="config/config.yaml"):
-    with open(config_path, "r") as file:
-        config = yaml.safe_load(file)
-    return config
-
-
-config = load_config()  # Load the configuration
 
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define the categories
-categories = ["not_rated", "rated"]
+categories = config["instances"]["classify_cls"]
 
 
 # Define the model architecture

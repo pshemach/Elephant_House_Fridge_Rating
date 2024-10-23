@@ -1,6 +1,10 @@
 from PIL import Image
 from eleRating.models.rating_model import get_rating
 from eleRating.models.segmentation import get_products
+from eleRating.utils import load_config
+from eleRating.constant import CONFIG_PATH
+
+config = load_config(config_path=CONFIG_PATH)
 
 
 def run_prediction(image_path):
@@ -12,16 +16,22 @@ def run_prediction(image_path):
     # Step 1: Get initial rating prediction
     rating = get_rating(image)
 
-    if rating == "not_rated":
-        return "Not Rated"
+    if rating == config["instances"]["classify_cls"][0]:
+        return config["output_cat"][0]
 
     # Step 2: Use segmentation to get product classes
     classes = get_products(image)
 
     # Step 3: Decide final rating
-    if "elephant-product" in classes and "other" not in classes:
-        return "Good"
-    elif "elephant-product" in classes and "other" in classes:
-        return "Bad"
+    if (
+        config["instances"]["segment_ins"]["products"][0] in classes
+        and config["instances"]["segment_ins"]["products"][1] not in classes
+    ):
+        return config["output_cat"][1]
+    elif (
+        config["instances"]["segment_ins"]["products"][0] in classes
+        and config["instances"]["segment_ins"]["products"][1] in classes
+    ):
+        return config["output_cat"][2]
     else:
-        return "Worst"
+        return config["output_cat"][3]
