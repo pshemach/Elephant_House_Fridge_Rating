@@ -1,4 +1,5 @@
 import yaml
+import os
 from PIL import Image
 from eleRating.constant import ALLOWED_FILE_EXTENSIONS
 
@@ -44,3 +45,23 @@ def is_inside_fridge(object_bbox, fridge_bbox):
     ):
         return True
     return False
+
+
+def make_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def delete_previous_files(upload_dir, result_path):
+    """
+    Deletes previous uploaded image and result image from the directories.
+    """
+    # Remove previous uploaded image
+    for filename in os.listdir(upload_dir):
+        file_path = os.path.join(upload_dir, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    # Remove previous result image
+    if os.path.exists(result_path):
+        os.remove(result_path)

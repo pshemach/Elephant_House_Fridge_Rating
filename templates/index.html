@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elephant House Product Rating</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center">Elephant House Product Rating</h1>
+      <div class="card shadow-sm p-4 mt-4">
+        <h3>Upload an Image</h3>
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <input
+              type="file"
+              class="form-control-file"
+              id="image"
+              name="image"
+              accept="image/*"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            Proceed
+          </button>
+        </form>
+
+        <div id="loading" style="display: none">
+          <h4>Processing...</h4>
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
+        <div id="result" class="mt-4" style="display: none">
+          <h4>Prediction:</h4>
+          <p id="prediction-text"></p>
+
+          <div class="row">
+            <div class="col-md-6">
+              <h5>Uploaded Image:</h5>
+              <img
+                id="uploaded-image"
+                src=""
+                alt="Uploaded Image"
+                class="img-fluid"
+              />
+            </div>
+            <div class="col-md-6">
+              <h5>Result Image:</h5>
+              <img
+                id="result-image"
+                src=""
+                alt="Result Image"
+                class="img-fluid"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#uploadForm").on("submit", function (event) {
+          event.preventDefault();
+
+          // Show loading spinner
+          $("#loading").show();
+          $("#result").hide();
+
+          // FormData object to handle the file upload
+          var formData = new FormData(this);
+
+          $.ajax({
+            url: "/predict",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+              $("#loading").hide();
+
+              if (response.prediction) {
+                // Display the prediction text
+                $("#prediction-text").text(response.prediction);
+
+                // Display the uploaded image
+                $("#uploaded-image").attr("src", response.image_path);
+
+                // Display the result image
+                $("#result-image").attr("src", response.result_image);
+
+                // Show the result div
+                $("#result").show();
+              } else if (response.error) {
+                alert("Error: " + response.error);
+              }
+            },
+            error: function (xhr, status, error) {
+              $("#loading").hide();
+              alert("An error occurred. Please try again.");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

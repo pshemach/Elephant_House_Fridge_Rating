@@ -1,13 +1,13 @@
 from ultralytics import YOLO
 import os
 import cv2
-from eleRating.utils import is_inside_fridge, load_config
+from eleRating.utils import is_inside_fridge, load_config, make_dir
 from eleRating.constant import (
     SEGMENTATION_CONF,
     IS_SAVE_SEGMENTATION,
     IMAGE_SAVE_DIR,
-    IMAGE_SAVE_NAME,
     CONFIG_PATH,
+    IMAGE_SAVE_PATH,
 )
 
 
@@ -104,7 +104,7 @@ def get_products(image):
 
         # Optionally save the result image
         result_image = result.plot()
-        cv2.imwrite(os.path.join(IMAGE_SAVE_DIR, IMAGE_SAVE_NAME), result_image)
+        cv2.imwrite(IMAGE_SAVE_PATH, result_image)
 
     # Return unique product classes that are inside the fridge
     unique_classes = set(detected_classes)
