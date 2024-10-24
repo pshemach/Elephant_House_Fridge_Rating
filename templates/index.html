@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elephant House Product Rating</title>
+    <title>Elephant House Freezer Rating</title>
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -15,7 +15,7 @@
   </head>
   <body>
     <div class="container mt-5">
-      <h1 class="text-center">Elephant House Product Rating</h1>
+      <h1 class="text-center">Elephant House Freezer Rating</h1>
       <div class="card shadow-sm p-4 mt-4">
         <h3>Upload an Image</h3>
         <form id="uploadForm" enctype="multipart/form-data">
@@ -43,26 +43,32 @@
 
         <div id="result" class="mt-4" style="display: none">
           <h4>Prediction:</h4>
-          <p id="prediction-text"></p>
+          <p id="prediction-text" style="color: black; font-size: 18px"></p>
 
-          <div class="row">
-            <div class="col-md-6">
-              <h5>Uploaded Image:</h5>
-              <img
-                id="uploaded-image"
-                src=""
-                alt="Uploaded Image"
-                class="img-fluid"
-              />
+          <div class="row d-flex align-items-start" style="margin-top: 10px">
+            <div class="col-md-6 d-flex justify-content-center">
+              <div>
+                <h5 class="text-center">Uploaded Image:</h5>
+                <img
+                  id="uploaded-image"
+                  src=""
+                  alt="Uploaded Image"
+                  class="img-fluid"
+                  style="max-width: 100%; height: 400px; object-fit: cover"
+                />
+              </div>
             </div>
-            <div class="col-md-6">
-              <h5>Result Image:</h5>
-              <img
-                id="result-image"
-                src=""
-                alt="Result Image"
-                class="img-fluid"
-              />
+            <div class="col-md-6 d-flex justify-content-center">
+              <div>
+                <h5 class="text-center">Result Image:</h5>
+                <img
+                  id="result-image"
+                  src=""
+                  alt="Result Image"
+                  class="img-fluid"
+                  style="max-width: 100%; height: 400px; object-fit: cover"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -98,8 +104,11 @@
                 // Display the uploaded image
                 $("#uploaded-image").attr("src", response.image_path);
 
-                // Display the result image
-                $("#result-image").attr("src", response.result_image);
+                // Display the result image with a cache-busting query parameter
+                $("#result-image").attr(
+                  "src",
+                  response.result_image + "?" + new Date().getTime()
+                );
 
                 // Show the result div
                 $("#result").show();

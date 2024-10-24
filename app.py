@@ -5,6 +5,7 @@ from eleRating.constant import (
     UPLOAD_IMAGE_DIR,
     IMAGE_SAVE_DIR,
     IMAGE_SAVE_PATH,
+    IMAGE_SAVE_NAME,
 )
 from eleRating.utils import is_allowed, make_dir, delete_previous_files
 
@@ -27,15 +28,14 @@ def image_selection():
 
     if request.method == "POST":
 
-        # Delete the previous images (uploaded and result)
-        delete_previous_files(UPLOAD_IMAGE_DIR, IMAGE_SAVE_PATH)
-
         # Check if image file is part of the request
         image = request.files.get("image")
 
         # Validate the uploaded file
         if image and is_allowed(image.filename):
             try:
+                # Delete the previous images (uploaded and result)
+                delete_previous_files(UPLOAD_IMAGE_DIR, IMAGE_SAVE_PATH)
                 # Save the uploaded image to a folder
                 image_path = os.path.join(UPLOAD_IMAGE_DIR, image.filename)
                 image.save(image_path)
@@ -47,8 +47,8 @@ def image_selection():
                 return jsonify(
                     {
                         "prediction": rating,
-                        "image_path": image_path,
-                        "result_image": IMAGE_SAVE_PATH,
+                        "image_path": f"/static/uploads/{image.filename}",  # URL relative to the static directory
+                        "result_image": f"/static/results/{IMAGE_SAVE_NAME}",  # Result image URL relative to static directory
                     }
                 )
 
