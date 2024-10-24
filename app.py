@@ -68,4 +68,4 @@ def image_selection():
 if __name__ == "__main__":
     make_dir(UPLOAD_IMAGE_DIR)
     make_dir(IMAGE_SAVE_DIR)
-    app.run(port=8181, debug=True)
+    app.run(host="0.0.0.0", port=8181, debug=True)
