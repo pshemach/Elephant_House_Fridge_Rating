@@ -19,7 +19,8 @@ categories = config["instances"]["classify_cls"]
 
 # Define the model architecture
 def load_rating_model():
-    model = torchvision.models.efficientnet_b0(pretrained=True).to(device)
+    # Load the model architecture
+    model = torchvision.models.efficientnet_b0()
     model.classifier = nn.Sequential(
         nn.Dropout(p=0.2, inplace=True),
         nn.Linear(in_features=1280, out_features=len(categories), bias=True),
