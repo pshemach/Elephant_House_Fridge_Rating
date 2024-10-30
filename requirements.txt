@@ -7,5 +7,6 @@ Pillow
 pyyaml
 uuid
 tempfile
+flask
 flask_limiter
 -e .
