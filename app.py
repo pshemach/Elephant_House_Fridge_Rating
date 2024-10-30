@@ -1,15 +1,22 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from eleRating.pipeline.run_prediction import run_prediction
-from eleRating.constant import (
-    UPLOAD_IMAGE_DIR,
-    IMAGE_SAVE_DIR,
-    IMAGE_SAVE_PATH,
-    IMAGE_SAVE_NAME,
+from eleRating.constant import UPLOAD_IMAGE_DIR, IMAGE_SAVE_DIR, TEMP_FILE_MAX_AGE
+from eleRating.utils import (
+    is_allowed,
+    make_dir,
+    unique_filenameuni,
+    create_temp_directory_with_age_limit,
 )
-from eleRating.utils import is_allowed, make_dir, delete_previous_files
+from flask_ngrok3 import run_with_ngrok, get_host
+from tempfile import mkdtemp
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+# run_with_ngrok(app)
+
+limiter = Limiter(get_remote_address, app=app)  # Initialize rate limiter
 
 
 @app.route("/")
@@ -20,6 +27,7 @@ def index():
     return render_template("index.html")
 
 
+@limiter.limit("20 per minute")  # Apply rate limit
 @app.route("/predict", methods=["POST"])
 def image_selection():
     """
@@ -34,21 +42,23 @@ def image_selection():
         # Validate the uploaded file
         if image and is_allowed(image.filename):
             try:
-                # Delete the previous images (uploaded and result)
-                delete_previous_files(UPLOAD_IMAGE_DIR, IMAGE_SAVE_PATH)
                 # Save the uploaded image to a folder
-                image_path = os.path.join(UPLOAD_IMAGE_DIR, image.filename)
+                tem_folder = create_temp_directory_with_age_limit(
+                    UPLOAD_IMAGE_DIR, max_age=TEMP_FILE_MAX_AGE
+                )
+                unique_filename = unique_filenameuni(image.filename)
+                image_path = os.path.join(tem_folder, unique_filename)
                 image.save(image_path)
 
                 # Run the prediction
-                rating = run_prediction(image_path)
+                rating, result_image_path = run_prediction(image_path)
 
                 # Return the result to the frontend
                 return jsonify(
                     {
                         "prediction": rating,
-                        "image_path": f"/static/uploads/{image.filename}",  # URL relative to the static directory
-                        "result_image": f"/static/results/{IMAGE_SAVE_NAME}",  # Result image URL relative to static directory
+                        "image_path": f"{tem_folder}/{unique_filename}",
+                        "result_image": f"{result_image_path}",
                     }
                 )
 
@@ -68,4 +78,4 @@ def image_selection():
 if __name__ == "__main__":
     make_dir(UPLOAD_IMAGE_DIR)
     make_dir(IMAGE_SAVE_DIR)
-    app.run(host="0.0.0.0", port=8181, debug=True)
+    app.run()

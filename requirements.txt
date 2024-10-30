@@ -5,4 +5,7 @@ torchvision
 from_root
 Pillow
 pyyaml
+uuid
+tempfile
+flask_limiter
 -e .

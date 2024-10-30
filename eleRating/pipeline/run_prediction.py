@@ -17,21 +17,21 @@ def run_prediction(image_path):
     rating = get_rating(image)
 
     if rating == config["instances"]["classify_cls"][0]:
-        return config["output_cat"][0]
+        return config["output_cat"][0], None
 
     # Step 2: Use segmentation to get product classes
-    classes = get_products(image)
+    classes, result_image_path = get_products(image)
 
     # Step 3: Decide final rating
     if (
         config["instances"]["segment_ins"]["products"][0] in classes
         and config["instances"]["segment_ins"]["products"][1] not in classes
     ):
-        return config["output_cat"][1]
+        return config["output_cat"][1], result_image_path
     elif (
         config["instances"]["segment_ins"]["products"][0] in classes
         and config["instances"]["segment_ins"]["products"][1] in classes
     ):
-        return config["output_cat"][2]
+        return config["output_cat"][2], result_image_path
     else:
-        return config["output_cat"][3]
+        return config["output_cat"][3], result_image_path
