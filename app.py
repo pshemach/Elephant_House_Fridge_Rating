@@ -8,12 +8,10 @@ from eleRating.utils import (
     unique_filenameuni,
     create_temp_directory_with_age_limit,
 )
-from flask_ngrok3 import run_with_ngrok
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-# run_with_ngrok(app)
 
 limiter = Limiter(get_remote_address, app=app)  # Initialize rate limiter
 

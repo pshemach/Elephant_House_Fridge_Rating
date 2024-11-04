@@ -1,49 +1,39 @@
-import os
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from eleRating.pipeline.run_prediction import run_prediction
-from eleRating.constant import UPLOAD_IMAGE_DIR, IMAGE_SAVE_DIR
-from eleRating.utils import (
-    is_allowed,
-    make_dir,
-    unique_filenameuni,
-    make_temp_folder,
-)
+from eleRating.constant import UPLOAD_IMAGE_DIR
+from eleRating.utils import is_allowed, make_dir, unique_filenameuni, make_temp_folder
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from PIL import Image
-import shutil
+from concurrent.futures import ProcessPoolExecutor
+import time
+from io import BytesIO
 
 app = Flask(__name__)
+limiter = Limiter(get_remote_address, app=app)
 
-limiter = Limiter(get_remote_address, app=app)  # Initialize rate limiter
+# Initialize ProcessPoolExecutor with a worker pool size (adjust based on your CPU)
+executor = ProcessPoolExecutor(max_workers=4)  # Adjust based on CPU cores
 
 
-@limiter.limit("20 per minute")  # Apply rate limit
+@limiter.limit("60 per minute")  # Adjusted rate limit
 @app.route("/predict", methods=["POST"])
 def image_selection():
-    """
-    API route for handling image uploads and returning the prediction result.
-    """
-
+    start = time.time()
     if request.method == "POST":
-
-        # Check if image file is part of the request
         image = request.files.get("image")
 
-        # Validate the uploaded file
         if image and is_allowed(image.filename):
             try:
-                # Save the uploaded image to a folder
-                tem_folder = make_temp_folder(UPLOAD_IMAGE_DIR)
-                unique_filename = unique_filenameuni(image.filename)
-                image_path = os.path.join(tem_folder, unique_filename)
-                image.save(image_path)
+                img = Image.open(BytesIO(image.read()))
 
-                # Run the prediction
-                rating, result_image_path = run_prediction(image_path)
+                # Run prediction asynchronously
+                future = executor.submit(run_prediction, img)
+                rating = future.result()
 
-                shutil.rmtree(tem_folder, ignore_errors=True)
-
+                done = time.time()
+                elapsed = done - start
+                print(f"Time Difference: {elapsed}")
                 # Return the result to the frontend
                 return jsonify({"prediction": rating})
 
@@ -62,5 +52,4 @@ def image_selection():
 
 if __name__ == "__main__":
     make_dir(UPLOAD_IMAGE_DIR)
-    make_dir(IMAGE_SAVE_DIR)
     app.run()
