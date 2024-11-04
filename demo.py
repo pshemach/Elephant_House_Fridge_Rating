@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from eleRating.pipeline.run_prediction import run_prediction
 from eleRating.constant import UPLOAD_IMAGE_DIR
-from eleRating.utils import is_allowed, make_dir, unique_filenameuni, make_temp_folder
+from eleRating.utils import is_allowed, make_dir
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from PIL import Image
