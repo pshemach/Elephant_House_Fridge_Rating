@@ -5,4 +5,4 @@ REM Activate the virtual environment
 call .venv\Scripts\activate
 
 REM Run the Flask app (adjust this line if you are using Waitress or another server)
-waitress-serve --host=0.0.0.0 --port=5051 demo:app
+waitress-serve --host=0.0.0.0 --port=5051 app:app

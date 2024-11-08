@@ -1,41 +1,63 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, request, jsonify, render_template
 from eleRating.pipeline.run_prediction import run_prediction
-from eleRating.constant import UPLOAD_IMAGE_DIR
-from eleRating.utils import is_allowed, make_dir
+from eleRating.constant import UPLOAD_IMAGE_DIR, IMAGE_SAVE_DIR, TEMP_FILE_MAX_AGE
+from eleRating.utils import (
+    is_allowed,
+    make_dir,
+    unique_filenameuni,
+    create_temp_directory_with_age_limit,
+)
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from PIL import Image
-from concurrent.futures import ProcessPoolExecutor
-import time
-from io import BytesIO
 
-app = Flask(__name__)
-limiter = Limiter(get_remote_address, app=app)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 
-# Initialize ProcessPoolExecutor with a worker pool size (adjust based on your CPU)
-executor = ProcessPoolExecutor(max_workers=4)  # Adjust based on CPU cores
+limiter = Limiter(get_remote_address, app=app)  # Initialize rate limiter
 
 
-@limiter.limit("60 per minute")  # Adjusted rate limit
+@app.route("/")
+def index():
+    """
+    Renders the upload form page.
+    """
+    return render_template("index.html")
+
+
+@limiter.limit("20 per minute")  # Apply rate limit
 @app.route("/predict", methods=["POST"])
 def image_selection():
-    start = time.time()
+    """
+    API route for handling image uploads and returning the prediction result.
+    """
+
     if request.method == "POST":
+
+        # Check if image file is part of the request
         image = request.files.get("image")
 
+        # Validate the uploaded file
         if image and is_allowed(image.filename):
             try:
-                img = Image.open(BytesIO(image.read()))
+                # Save the uploaded image to a folder
+                tem_folder = create_temp_directory_with_age_limit(
+                    UPLOAD_IMAGE_DIR, max_age=TEMP_FILE_MAX_AGE
+                )
+                unique_filename = unique_filenameuni(image.filename)
+                image_path = os.path.join(tem_folder, unique_filename)
+                image.save(image_path)
 
-                # Run prediction asynchronously
-                future = executor.submit(run_prediction, img)
-                rating = future.result()
+                # Run the prediction
+                rating, result_image_path = run_prediction(image_path)
 
-                done = time.time()
-                elapsed = done - start
-                print(f"Time Difference: {elapsed}")
                 # Return the result to the frontend
-                return jsonify({"prediction": rating})
+                return jsonify(
+                    {
+                        "prediction": rating,
+                        "image_path": f"{tem_folder}/{unique_filename}",
+                        "result_image": f"{result_image_path}",
+                    }
+                )
 
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
@@ -52,4 +74,5 @@ def image_selection():
 
 if __name__ == "__main__":
     make_dir(UPLOAD_IMAGE_DIR)
-    app.run(host="0.0.0.0", port="5051")
+    make_dir(IMAGE_SAVE_DIR)
+    app.run()
